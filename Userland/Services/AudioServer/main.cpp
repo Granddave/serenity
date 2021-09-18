@@ -6,7 +6,7 @@
  */
 
 #include "Mixer.h"
-#include <LibCore/ConfigFile.h>
+#include <LibConfig/Client.h>
 #include <LibCore/File.h>
 #include <LibCore/LocalServer.h>
 
@@ -17,8 +17,7 @@ int main(int, char**)
         return 1;
     }
 
-    auto config = Core::ConfigFile::open_for_app("Audio", Core::ConfigFile::AllowWriting::Yes);
-    if (unveil(config->filename().characters(), "rwc") < 0) {
+    if (unveil("/tmp/portal/config", "rw") < 0) {
         perror("unveil");
         return 1;
     }
@@ -29,7 +28,11 @@ int main(int, char**)
     unveil(nullptr, nullptr);
 
     Core::EventLoop event_loop;
-    AudioServer::Mixer mixer { config };
+
+    Config::pledge_domains("Audio");
+    Config::monitor_domain("Audio");
+
+    AudioServer::Mixer mixer;
 
     auto server = Core::LocalServer::construct();
     bool ok = server->take_over_from_system_server();

@@ -17,6 +17,7 @@
 #include <AK/RefCounted.h>
 #include <AK/WeakPtr.h>
 #include <LibAudio/Buffer.h>
+#include <LibConfig/Listener.h>
 #include <LibCore/File.h>
 #include <LibCore/Timer.h>
 #include <LibThreading/ConditionVariable.h>
@@ -105,10 +106,12 @@ private:
     FadingProperty<double> m_volume { 1 };
 };
 
-class Mixer : public Core::Object {
+class Mixer final
+    : public Core::Object
+    , public Config::Listener {
     C_OBJECT(Mixer)
 public:
-    Mixer(NonnullRefPtr<Core::ConfigFile> config);
+    Mixer();
     virtual ~Mixer() override;
 
     NonnullRefPtr<ClientAudioStream> create_queue(ClientConnection&);
@@ -123,8 +126,13 @@ public:
     int audiodevice_set_sample_rate(u16 sample_rate);
     u16 audiodevice_get_sample_rate() const;
 
+    // ^Config::Listener
+    void config_i32_did_change(String const& domain, String const& group, String const& key, i32 value) override;
+    void config_bool_did_change(String const& domain, String const& group, String const& key, bool value) override;
+
 private:
-    void request_setting_sync();
+    void set_main_volume_impl(double);
+    void set_muted_impl(bool);
 
     Vector<NonnullRefPtr<ClientAudioStream>> m_pending_mixing;
     Threading::Mutex m_pending_mutex;
@@ -137,15 +145,11 @@ private:
     bool m_muted { false };
     FadingProperty<double> m_main_volume { 1 };
 
-    NonnullRefPtr<Core::ConfigFile> m_config;
     RefPtr<Core::Timer> m_config_write_timer;
 
     static u8 m_zero_filled_buffer[4096];
 
     void mix();
 };
-
-// Interval in ms when the server tries to save its configuration to disk.
-constexpr unsigned AUDIO_CONFIG_WRITE_INTERVAL = 2000;
 
 }

@@ -7,12 +7,12 @@
 
 #include "Mixer.h"
 #include "AK/Format.h"
+#include "LibConfig/Client.h"
 #include <AK/Array.h>
 #include <AK/MemoryStream.h>
 #include <AK/NumericLimits.h>
 #include <AudioServer/ClientConnection.h>
 #include <AudioServer/Mixer.h>
-#include <LibCore/ConfigFile.h>
 #include <LibCore/Timer.h>
 #include <pthread.h>
 #include <stdlib.h>
@@ -22,7 +22,7 @@ namespace AudioServer {
 
 u8 Mixer::m_zero_filled_buffer[4096];
 
-Mixer::Mixer(NonnullRefPtr<Core::ConfigFile> config)
+Mixer::Mixer()
     : m_device(Core::File::construct("/dev/audio", this))
     , m_sound_thread(Threading::Thread::construct(
           [this] {
@@ -30,15 +30,14 @@ Mixer::Mixer(NonnullRefPtr<Core::ConfigFile> config)
               return 0;
           },
           "AudioServer[mixer]"))
-    , m_config(move(config))
 {
     if (!m_device->open(Core::OpenMode::WriteOnly)) {
         dbgln("Can't open audio device: {}", m_device->error_string());
         return;
     }
 
-    m_muted = m_config->read_bool_entry("Master", "Mute", false);
-    m_main_volume = static_cast<double>(m_config->read_num_entry("Master", "Volume", 100)) / 100.0;
+    m_muted = Config::read_bool("Audio", "Master", "Mute", false);
+    m_main_volume = static_cast<double>(Config::read_i32("Audio", "Master", "Volume", 100)) / 100.0;
 
     m_sound_thread->start();
 }
@@ -136,15 +135,22 @@ void Mixer::mix()
 
 void Mixer::set_main_volume(double volume)
 {
+    if (m_main_volume.target() == volume) {
+        return;
+    }
+
+    set_main_volume_impl(volume);
+    Config::write_i32("Audio", "Master", "Volume", static_cast<int>(volume * 100));
+}
+
+void Mixer::set_main_volume_impl(double volume)
+{
     if (volume < 0)
         m_main_volume = 0;
     else if (volume > 2)
         m_main_volume = 2;
     else
         m_main_volume = volume;
-
-    m_config->write_num_entry("Master", "Volume", static_cast<int>(volume * 100));
-    request_setting_sync();
 
     ClientConnection::for_each([&](ClientConnection& client) {
         client.did_change_main_mix_volume({}, main_volume());
@@ -155,10 +161,14 @@ void Mixer::set_muted(bool muted)
 {
     if (m_muted == muted)
         return;
-    m_muted = muted;
 
-    m_config->write_bool_entry("Master", "Mute", m_muted);
-    request_setting_sync();
+    set_muted_impl(muted);
+    Config::write_bool("Audio", "Master", "Mute", m_muted);
+}
+
+void Mixer::set_muted_impl(bool muted)
+{
+    m_muted = muted;
 
     ClientConnection::for_each([muted](ClientConnection& client) {
         client.did_change_muted_state({}, muted);
@@ -182,16 +192,25 @@ u16 Mixer::audiodevice_get_sample_rate() const
     return sample_rate;
 }
 
-void Mixer::request_setting_sync()
+void Mixer::config_i32_did_change(String const& domain, String const& group, String const& key, i32 value)
 {
-    if (m_config_write_timer.is_null() || !m_config_write_timer->is_active()) {
-        m_config_write_timer = Core::Timer::create_single_shot(
-            AUDIO_CONFIG_WRITE_INTERVAL,
-            [this] {
-                m_config->sync();
-            },
-            this);
-        m_config_write_timer->start();
+    if (domain != "Audio" || group != "Master")
+        return;
+
+    if (key == "Volume") {
+        set_main_volume_impl(static_cast<double>(value) / 100.0);
+        return;
+    }
+}
+
+void Mixer::config_bool_did_change(String const& domain, String const& group, String const& key, bool value)
+{
+    if (domain != "Audio" || group != "Master")
+        return;
+
+    if (key == "Muted") {
+        set_muted_impl(value);
+        return;
     }
 }
 
