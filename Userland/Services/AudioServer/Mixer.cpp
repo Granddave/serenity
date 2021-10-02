@@ -112,11 +112,7 @@ void Mixer::mix()
             for (size_t i = 0; i < mixed_buffer_length; ++i) {
                 auto& mixed_sample = mixed_buffer[i];
 
-                // Even though it's not realistic, the user expects no sound at 0%.
-                if (m_main_volume < 0.01)
-                    mixed_sample = { 0 };
-                else
-                    mixed_sample.log_multiply(m_main_volume);
+                mixed_sample.log_multiply(m_main_volume);
                 mixed_sample.clip();
 
                 LittleEndian<i16> out_sample;
