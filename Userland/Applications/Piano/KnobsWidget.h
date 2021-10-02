@@ -51,6 +51,4 @@ private:
     RefPtr<ProcessorParameterDropdown<LibDSP::Synthesizers::Waveform>> m_synth_waveform;
     NonnullRefPtrVector<GUI::Widget> m_synth_knobs;
     NonnullRefPtrVector<ProcessorParameterSlider> m_delay_knobs;
-
-    bool m_change_underlying { true };
 };

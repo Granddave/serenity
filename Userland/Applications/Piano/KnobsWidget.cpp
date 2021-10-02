@@ -47,8 +47,7 @@ KnobsWidget::KnobsWidget(TrackManager& track_manager, MainWidget& main_widget)
     m_volume_knob->set_step(10);
     m_volume_knob->on_change = [this](int value) {
         int new_volume = volume_max - value;
-        if (m_change_underlying)
-            m_track_manager.current_track().set_volume(new_volume);
+        m_track_manager.current_track().set_volume(new_volume);
         VERIFY(new_volume == m_track_manager.current_track().volume());
         m_volume_value->set_text(String::number(new_volume));
     };
@@ -60,8 +59,7 @@ KnobsWidget::KnobsWidget(TrackManager& track_manager, MainWidget& main_widget)
     m_octave_knob->set_step(1);
     m_octave_knob->on_change = [this](int value) {
         int new_octave = octave_max - value;
-        if (m_change_underlying)
-            m_main_widget.set_octave_and_ensure_note_change(new_octave);
+        m_main_widget.set_octave_and_ensure_note_change(new_octave);
         VERIFY(new_octave == m_track_manager.octave());
         m_octave_value->set_text(String::number(new_octave));
     };
@@ -114,13 +112,6 @@ void KnobsWidget::cycle_waveform()
 
 void KnobsWidget::update_knobs()
 {
-    // FIXME: This is needed because when the slider is changed normally, we
-    // need to change the underlying value, but if the keyboard was used, we
-    // need to change the slider without changing the underlying value.
-    m_change_underlying = false;
-
-    m_volume_knob->set_value(volume_max - m_track_manager.current_track().volume());
-    m_octave_knob->set_value(octave_max - m_track_manager.octave());
-
-    m_change_underlying = true;
+    m_volume_knob->set_value(volume_max - m_track_manager.current_track().volume(), GUI::AllowCallback::No);
+    m_octave_knob->set_value(octave_max - m_track_manager.octave(), GUI::AllowCallback::No);
 }
