@@ -78,7 +78,7 @@ void Mixer::mix()
         active_mix_queues.remove_all_matching([&](auto& entry) { return !entry->client(); });
 
         Audio::Sample mixed_buffer[1024];
-        auto mixed_buffer_length = (int)(sizeof(mixed_buffer) / sizeof(Audio::Sample));
+        size_t mixed_buffer_length = sizeof(mixed_buffer) / sizeof(Audio::Sample);
 
         m_main_volume.advance_time();
 
@@ -92,7 +92,7 @@ void Mixer::mix()
             ++active_queues;
             queue->volume().advance_time();
 
-            for (int i = 0; i < mixed_buffer_length; ++i) {
+            for (size_t i = 0; i < mixed_buffer_length; ++i) {
                 auto& mixed_sample = mixed_buffer[i];
                 Audio::Sample sample;
                 if (!queue->get_next_sample(sample))
@@ -109,7 +109,7 @@ void Mixer::mix()
             Array<u8, 4096> buffer;
             OutputMemoryStream stream { buffer };
 
-            for (int i = 0; i < mixed_buffer_length; ++i) {
+            for (size_t i = 0; i < mixed_buffer_length; ++i) {
                 auto& mixed_sample = mixed_buffer[i];
 
                 // Even though it's not realistic, the user expects no sound at 0%.

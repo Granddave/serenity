@@ -91,7 +91,7 @@ String Track::set_recorded_sample(const StringView& path)
     m_recorded_sample.resize(buffer->sample_count());
 
     double peak = 0;
-    for (int i = 0; i < buffer->sample_count(); ++i) {
+    for (size_t i = 0; i < buffer->sample_count(); ++i) {
         double left_abs = fabs(buffer->samples()[i].left);
         double right_abs = fabs(buffer->samples()[i].right);
         if (left_abs > peak)
@@ -101,7 +101,7 @@ String Track::set_recorded_sample(const StringView& path)
     }
 
     if (peak) {
-        for (int i = 0; i < buffer->sample_count(); ++i) {
+        for (size_t i = 0; i < buffer->sample_count(); ++i) {
             m_recorded_sample[i].left = buffer->samples()[i].left / peak;
             m_recorded_sample[i].right = buffer->samples()[i].right / peak;
         }

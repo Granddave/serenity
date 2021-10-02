@@ -96,7 +96,7 @@ public:
 private:
     RefPtr<Audio::Buffer> m_current;
     Queue<NonnullRefPtr<Audio::Buffer>> m_queue;
-    int m_position { 0 };
+    size_t m_position { 0 };
     int m_remaining_samples { 0 };
     int m_played_samples { 0 };
     bool m_paused { false };

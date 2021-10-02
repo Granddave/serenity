@@ -78,9 +78,9 @@ public:
     }
 
     const Sample* samples() const { return (const Sample*)data(); }
-    int sample_count() const { return m_sample_count; }
+    size_t sample_count() const { return m_sample_count; }
     const void* data() const { return m_buffer.data<void>(); }
-    int size_in_bytes() const { return m_sample_count * (int)sizeof(Sample); }
+    size_t size_in_bytes() const { return m_sample_count * sizeof(Sample); }
     int id() const { return m_id; }
     const Core::AnonymousBuffer& anonymous_buffer() const { return m_buffer; }
 
@@ -104,7 +104,7 @@ private:
 
     Core::AnonymousBuffer m_buffer;
     const i32 m_id;
-    const int m_sample_count;
+    const size_t m_sample_count;
 };
 
 // This only works for double resamplers, and therefore cannot be part of the class
