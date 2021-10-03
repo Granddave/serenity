@@ -40,6 +40,11 @@ KnobsWidget::KnobsWidget(TrackManager& track_manager, MainWidget& main_widget)
     m_volume_label = m_labels_container->add<GUI::Label>("Volume");
     m_volume_knob = m_knobs_container->add<ProcessorParameterSlider>(Orientation::Vertical, master_parameter, m_volume_value, 100.0);
 
+    auto& pan_parameter = *m_track_manager.current_track().master()->find_parameter_of_type_named<LibDSP::ProcessorRangeParameter>("Pan");
+    m_pan_value = m_values_container->add<GUI::Label>(String::formatted("{:.1f}", static_cast<double>(pan_parameter.value())));
+    m_pan_label = m_labels_container->add<GUI::Label>("Pan");
+    m_pan_knob = m_knobs_container->add<ProcessorParameterSlider>(Orientation::Vertical, pan_parameter, m_pan_value);
+
     m_octave_knob = m_knobs_container->add<GUI::VerticalSlider>();
     m_octave_knob->set_tooltip("Z: octave down, X: octave up");
     m_octave_knob->set_range(octave_min - 1, octave_max - 1);

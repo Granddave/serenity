@@ -35,18 +35,21 @@ private:
 
     RefPtr<GUI::Widget> m_labels_container;
     RefPtr<GUI::Label> m_volume_label;
+    RefPtr<GUI::Label> m_pan_label;
     RefPtr<GUI::Label> m_octave_label;
     NonnullRefPtrVector<GUI::Label> m_synth_labels;
     NonnullRefPtrVector<GUI::Label> m_delay_labels;
 
     RefPtr<GUI::Widget> m_values_container;
     RefPtr<GUI::Label> m_volume_value;
+    RefPtr<GUI::Label> m_pan_value;
     RefPtr<GUI::Label> m_octave_value;
     NonnullRefPtrVector<GUI::Label> m_synth_values;
     NonnullRefPtrVector<GUI::Label> m_delay_values;
 
     RefPtr<GUI::Widget> m_knobs_container;
     RefPtr<ProcessorParameterSlider> m_volume_knob;
+    RefPtr<ProcessorParameterSlider> m_pan_knob;
     RefPtr<GUI::Slider> m_octave_knob;
     RefPtr<ProcessorParameterDropdown<LibDSP::Synthesizers::Waveform>> m_synth_waveform;
     NonnullRefPtrVector<GUI::Widget> m_synth_knobs;
