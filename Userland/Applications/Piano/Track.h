@@ -30,16 +30,17 @@ public:
 
     const Vector<Audio::Sample>& recorded_sample() const { return m_recorded_sample; }
     const SinglyLinkedList<RollNote>& roll_notes(int note) const { return m_roll_notes[note]; }
-    int volume() const { return m_volume; }
+    double volume() const { return m_volume; }
     NonnullRefPtr<LibDSP::Synthesizers::Classic> synth() { return m_synth; }
     NonnullRefPtr<LibDSP::Effects::Delay> delay() { return m_delay; }
+    NonnullRefPtr<LibDSP::Effects::Mastering> master() { return m_master; }
 
     void fill_sample(Sample& sample);
     void reset();
     String set_recorded_sample(const StringView& path);
     void set_roll_note(int note, u32 on_sample, u32 off_sample);
     void set_keyboard_note(int note, Switch state);
-    void set_volume(int volume);
+    void set_volume(double volume);
 
 private:
     Audio::Sample recorded_sample(size_t note);
@@ -48,13 +49,14 @@ private:
 
     Vector<Audio::Sample> m_recorded_sample;
 
-    int m_volume;
+    double m_volume; // Range: [0, 1]
 
     const u32& m_time;
 
     NonnullRefPtr<LibDSP::Transport> m_temporary_transport;
-    NonnullRefPtr<LibDSP::Effects::Delay> m_delay;
     NonnullRefPtr<LibDSP::Synthesizers::Classic> m_synth;
+    NonnullRefPtr<LibDSP::Effects::Delay> m_delay;
+    NonnullRefPtr<LibDSP::Effects::Mastering> m_master;
 
     SinglyLinkedList<RollNote> m_roll_notes[note_count];
     RollIter m_roll_iterators[note_count];

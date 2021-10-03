@@ -46,7 +46,7 @@ private:
     NonnullRefPtrVector<GUI::Label> m_delay_values;
 
     RefPtr<GUI::Widget> m_knobs_container;
-    RefPtr<GUI::Slider> m_volume_knob;
+    RefPtr<ProcessorParameterSlider> m_volume_knob;
     RefPtr<GUI::Slider> m_octave_knob;
     RefPtr<ProcessorParameterDropdown<LibDSP::Synthesizers::Waveform>> m_synth_waveform;
     NonnullRefPtrVector<GUI::Widget> m_synth_knobs;

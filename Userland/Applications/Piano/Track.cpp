@@ -12,14 +12,16 @@
 #include <AK/NonnullRefPtr.h>
 #include <AK/NumericLimits.h>
 #include <LibAudio/Loader.h>
+#include <LibAudio/Sample.h>
 #include <LibDSP/Music.h>
 #include <math.h>
 
 Track::Track(const u32& time)
     : m_time(time)
     , m_temporary_transport(make_ref_counted<LibDSP::Transport>(120, 4))
-    , m_delay(make_ref_counted<LibDSP::Effects::Delay>(m_temporary_transport))
     , m_synth(make_ref_counted<LibDSP::Synthesizers::Classic>(m_temporary_transport))
+    , m_delay(make_ref_counted<LibDSP::Effects::Delay>(m_temporary_transport))
+    , m_master(make_ref_counted<LibDSP::Effects::Mastering>(m_temporary_transport))
 {
     set_volume(volume_max);
 }
@@ -51,20 +53,17 @@ void Track::fill_sample(Sample& sample)
 
     auto synthesized_sample = m_synth->process(playing_notes).get<LibDSP::Sample>();
     auto delayed_sample = m_delay->process(synthesized_sample).get<LibDSP::Sample>();
+    auto mastered_sample = m_master->process(delayed_sample).get<LibDSP::Sample>();
 
     // HACK: Convert to old Piano datastructures
-    new_sample.left = delayed_sample.left * NumericLimits<i16>::max();
-    new_sample.right = delayed_sample.right * NumericLimits<i16>::max();
+    new_sample.left = mastered_sample.left * NumericLimits<i16>::max();
+    new_sample.right = mastered_sample.right * NumericLimits<i16>::max();
 
     new_sample.left = clamp(new_sample.left, NumericLimits<i16>::min(), NumericLimits<i16>::max());
     new_sample.right = clamp(new_sample.right, NumericLimits<i16>::min(), NumericLimits<i16>::max());
 
     sample.left += new_sample.left;
     sample.right += new_sample.right;
-
-    // TODO: Master processor
-    sample.left *= m_volume / static_cast<double>(volume_max) * volume_factor;
-    sample.right *= m_volume / static_cast<double>(volume_max) * volume_factor;
 }
 
 void Track::reset()
@@ -168,8 +167,9 @@ void Track::set_keyboard_note(int note, Switch state)
             = RollNote { m_time, m_time + static_cast<u32>(sample_rate) * 10'000, static_cast<u8>(note), 0 };
 }
 
-void Track::set_volume(int volume)
+void Track::set_volume(double volume)
 {
-    VERIFY(volume >= 0);
+    VERIFY(volume >= 0.0);
+    VERIFY(volume <= 1.0);
     m_volume = volume;
 }
