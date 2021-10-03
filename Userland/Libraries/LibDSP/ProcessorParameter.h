@@ -34,6 +34,8 @@ public:
     {
     }
 
+    virtual ~ProcessorParameter() = default;
+
     String const& name() const { return m_name; }
     ParameterType type() const { return m_type; }
 
@@ -57,10 +59,13 @@ public:
         , m_value(move(initial_value))
     {
     }
+
     ProcessorParameterSingleValue(String name, ParameterT initial_value)
         : ProcessorParameterSingleValue(move(name), initial_value, ParameterType::Invalid)
     {
     }
+
+    ~ProcessorParameterSingleValue() override = default;
 
     operator ParameterT() const
     {
@@ -100,6 +105,8 @@ public:
         : Detail::ProcessorParameterSingleValue<bool>(move(name), move(initial_value), ParameterType::Boolean)
     {
     }
+
+    ~ProcessorBooleanParameter() override = default;
 };
 
 class ProcessorRangeParameter final : public Detail::ProcessorParameterSingleValue<ParameterFixedPoint> {
@@ -117,6 +124,8 @@ public:
         : ProcessorRangeParameter(to_copy.name(), to_copy.min_value(), to_copy.max_value(), to_copy.value())
     {
     }
+
+    ~ProcessorRangeParameter() override = default;
 
     ParameterFixedPoint min_value() const { return m_min_value; }
     ParameterFixedPoint max_value() const { return m_max_value; }
@@ -140,6 +149,8 @@ public:
         : Detail::ProcessorParameterSingleValue<EnumT>(move(name), initial_value, ParameterType::Enum)
     {
     }
+
+    ~ProcessorEnumParameter() override = default;
 };
 
 }

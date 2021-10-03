@@ -22,7 +22,7 @@ public:
         , m_current_signal(Sample {})
     {
     }
-    virtual ~Track() override = default;
+    ~Track() override = default;
 
     virtual bool check_processor_chain_valid() const = 0;
     bool add_processor(NonnullRefPtr<Processor> new_processor);
@@ -47,7 +47,7 @@ protected:
 
 class NoteTrack final : public Track {
 public:
-    virtual ~NoteTrack() override = default;
+    ~NoteTrack() override = default;
 
     bool check_processor_chain_valid() const override;
     NonnullRefPtrVector<NoteClip> const& clips() const { return m_clips; }
@@ -61,7 +61,7 @@ private:
 
 class AudioTrack final : public Track {
 public:
-    virtual ~AudioTrack() override = default;
+    ~AudioTrack() override = default;
 
     bool check_processor_chain_valid() const override;
     NonnullRefPtrVector<AudioClip> const& clips() const { return m_clips; }

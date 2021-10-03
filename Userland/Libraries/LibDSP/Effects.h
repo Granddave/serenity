@@ -18,6 +18,7 @@ namespace LibDSP::Effects {
 class Delay : public EffectProcessor {
 public:
     Delay(NonnullRefPtr<Transport>);
+    ~Delay() override = default;
 
 private:
     virtual Signal process_impl(Signal const&) override;
@@ -36,6 +37,7 @@ private:
 class Mastering : public EffectProcessor {
 public:
     Mastering(NonnullRefPtr<Transport>);
+    ~Mastering() override = default;
 
 private:
     virtual Signal process_impl(Signal const&) override;

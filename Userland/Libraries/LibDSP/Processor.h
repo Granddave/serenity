@@ -21,9 +21,8 @@ class Processor : public Core::Object {
     C_OBJECT_ABSTRACT(Processor);
 
 public:
-    virtual ~Processor()
-    {
-    }
+    ~Processor() override = default;
+
     Signal process(Signal const& input_signal)
     {
         VERIFY(input_signal.type() == m_input_type);
@@ -54,6 +53,9 @@ protected:
 
 // A common type of processor that changes audio data, i.e. applies an effect to it.
 class EffectProcessor : public Processor {
+public:
+    ~EffectProcessor() override = default;
+
 protected:
     EffectProcessor(NonnullRefPtr<Transport> transport)
         : Processor(transport, SignalType::Sample, SignalType::Sample)
@@ -63,6 +65,9 @@ protected:
 
 // A common type of processor that synthesizes audio from note data.
 class SynthesizerProcessor : public Processor {
+public:
+    ~SynthesizerProcessor() override = default;
+
 protected:
     SynthesizerProcessor(NonnullRefPtr<Transport> transport)
         : Processor(transport, SignalType::Note, SignalType::Sample)

@@ -33,6 +33,7 @@ struct PitchedEnvelope : Envelope {
         , note(note)
     {
     }
+    ~PitchedEnvelope() override = default;
 
     u8 note;
 };
@@ -40,6 +41,7 @@ struct PitchedEnvelope : Envelope {
 class Classic : public SynthesizerProcessor {
 public:
     Classic(NonnullRefPtr<Transport>);
+    ~Classic() override = default;
 
     static Envelope compute_envelope(RollNote&);
 

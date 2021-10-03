@@ -24,6 +24,7 @@ struct Envelope {
         : envelope(envelope)
     {
     }
+    constexpr virtual ~Envelope() = default;
 
     constexpr bool is_attack() const { return 0 <= envelope && envelope < 1; }
     constexpr double attack() const { return clamp(envelope, 0, 1); }
