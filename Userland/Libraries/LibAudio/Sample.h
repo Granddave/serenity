@@ -179,6 +179,25 @@ struct Sample {
         return { left * factor, right * factor };
     }
 
+    constexpr Sample& operator*=(Sample const& other)
+    {
+        left = left * other.left;
+        right = right * other.right;
+        return *this;
+    }
+
+    constexpr Sample& operator*(Sample const& other)
+    {
+        left *= other.left;
+        right *= other.right;
+        return *this;
+    }
+
+    constexpr Sample operator*(Sample const& other) const
+    {
+        return { left * other.left, right * other.right };
+    }
+
     constexpr Sample& operator+=(Sample const& other)
     {
         left += other.left;
