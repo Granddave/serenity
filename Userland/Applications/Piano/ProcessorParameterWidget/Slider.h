@@ -17,7 +17,7 @@ class ProcessorParameterSlider : public GUI::Slider
     C_OBJECT(ProcessorParameterSlider);
 
 public:
-    ProcessorParameterSlider(Orientation, LibDSP::ProcessorRangeParameter&, RefPtr<GUI::Label>);
+    ProcessorParameterSlider(Orientation, LibDSP::ProcessorRangeParameter&, RefPtr<GUI::Label>, double label_value_scale = 1.0);
 
 protected:
     LibDSP::ProcessorRangeParameter& m_parameter;
