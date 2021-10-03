@@ -65,14 +65,14 @@ Mastering::Mastering(NonnullRefPtr<Transport> transport)
 Signal Mastering::process_impl(Signal const& input_signal)
 {
     Sample const& in = input_signal.get<Sample>();
-    Sample out;
 
     if (m_mute.value()) {
-        return Signal(out);
+        return Sample();
     }
 
-    out += in.panned(static_cast<double>(m_pan));
-    out += in.log_multiplied(static_cast<double>(m_master_volume));
+    Sample out(in);
+    out.pan(static_cast<double>(m_pan));
+    out.log_multiply(static_cast<double>(m_master_volume));
     return Signal(out);
 }
 

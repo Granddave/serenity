@@ -115,6 +115,12 @@ struct Sample {
     {
     }
 
+    constexpr Sample(Sample const& other)
+        : left(other.left)
+        , right(other.right)
+    {
+    }
+
     void clip()
     {
         if (left > 1)
