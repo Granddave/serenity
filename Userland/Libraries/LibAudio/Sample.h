@@ -167,16 +167,16 @@ struct Sample {
         return new_sample;
     }
 
-    constexpr Sample& operator*=(double const mult)
+    constexpr Sample& operator*=(double const factor)
     {
-        left *= mult;
-        right *= mult;
+        left *= factor;
+        right *= factor;
         return *this;
     }
 
-    constexpr Sample operator*(double const mult)
+    constexpr Sample operator*(double const factor) const
     {
-        return { left * mult, right * mult };
+        return { left * factor, right * factor };
     }
 
     constexpr Sample& operator+=(Sample const& other)
@@ -185,14 +185,15 @@ struct Sample {
         right += other.right;
         return *this;
     }
-    constexpr Sample& operator+=(double other)
+
+    constexpr Sample& operator+=(double addend)
     {
-        left += other;
-        right += other;
+        left += addend;
+        right += addend;
         return *this;
     }
 
-    constexpr Sample operator+(Sample const& other)
+    constexpr Sample operator+(Sample const& other) const
     {
         return { left + other.left, right + other.right };
     }
